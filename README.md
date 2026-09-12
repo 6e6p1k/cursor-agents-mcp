@@ -56,7 +56,9 @@ Register with Claude Code, in `~/.claude.json`:
 }
 ```
 
-For the status line, see [docs/statusline.md](docs/statusline.md).
+Defaults (model, effort, sandbox, fast-tier policy) are environment variables —
+see [docs/configuration.md](docs/configuration.md). For the status line, see
+[docs/statusline.md](docs/statusline.md).
 
 ## Security
 
@@ -102,6 +104,7 @@ invalidate it.
 
 | | |
 | --- | --- |
+| [configuration.md](docs/configuration.md) | Environment variables for every shipped default |
 | [architecture.md](docs/architecture.md) | Process model, the on-disk record, why runners are detached |
 | [tools.md](docs/tools.md) | The seven tools and their arguments |
 | [context-economy.md](docs/context-economy.md) | Why no tool returns a transcript |

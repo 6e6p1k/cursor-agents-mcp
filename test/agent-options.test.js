@@ -2,7 +2,7 @@
 
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { agentOptions, READ_ONLY_DISALLOWED, SETTING_SOURCES } from "../src/agent-options.js";
+import { agentOptions, READ_ONLY_DISALLOWED, settingSources } from "../src/agent-options.js";
 
 /**
  * The SDK's tool vocabulary, as reported by `Agent.create` when rejecting an
@@ -52,8 +52,8 @@ describe("agentOptions", () => {
   });
 
   it("always loads project MCP servers", () => {
-    assert.deepEqual(agentOptions(META).local.settingSources, SETTING_SOURCES);
-    assert.ok(SETTING_SOURCES.includes("project"));
+    assert.deepEqual(agentOptions(META).local.settingSources, settingSources());
+    assert.ok(settingSources().includes("project"));
   });
 
   it("gives each agent its own store, to avoid cross-runner lock contention", () => {

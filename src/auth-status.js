@@ -6,8 +6,8 @@
  * and the tests never touch `~/.cursor/sdk/auth.json`. See docs/statusline.md.
  */
 
-/** Days before expiry at which the status line starts warning. */
-const WARN_WITHIN_DAYS = 14;
+/** Days before expiry at which the status line warns, absent configuration. */
+export const DEFAULT_WARN_WITHIN_DAYS = 14;
 
 /** Milliseconds in one day. */
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -17,9 +17,10 @@ const DAY_MS = 24 * 60 * 60 * 1000;
  *
  * @param {any} auth Result of `Cursor.auth.status()`, or a test double.
  * @param {number} now Epoch milliseconds treated as the current time.
+ * @param {number} [warnWithinDays] Days before expiry at which to start warning.
  * @returns {string|null} A short warning, or null when there is nothing to flag.
  */
-export function authExpiryWarning(auth, now) {
+export function authExpiryWarning(auth, now, warnWithinDays = DEFAULT_WARN_WITHIN_DAYS) {
   if (!auth || typeof auth !== "object") return null;
 
   if (auth.status === "logged-out") return "⚠ SDK logged out";
@@ -31,7 +32,7 @@ export function authExpiryWarning(auth, now) {
   if (expiresAt <= now) return "⚠ SDK key expired";
 
   const remaining = expiresAt - now;
-  if (remaining > WARN_WITHIN_DAYS * DAY_MS) return null;
+  if (remaining > warnWithinDays * DAY_MS) return null;
 
   return `⚠ SDK key expires in ${Math.ceil(remaining / DAY_MS)}d`;
 }

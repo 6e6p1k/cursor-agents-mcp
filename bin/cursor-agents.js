@@ -8,6 +8,8 @@
  */
 
 import { authExpiryWarning } from "../src/auth-status.js";
+import { loadConfig } from "../src/config.js";
+import { modelFamily } from "../src/models.js";
 import { formatElapsed } from "../src/tools/inspect.js";
 import { agentPaths } from "../src/paths.js";
 import { listRecords, readLines, readResult, readStatus, TERMINAL_STATES } from "../src/store.js";
@@ -107,10 +109,23 @@ async function ls(argv) {
 async function readAuthWarning() {
   try {
     const { Cursor } = await import("@cursor/sdk");
-    return authExpiryWarning(await Cursor.auth.status(), Date.now());
+    return authExpiryWarning(await Cursor.auth.status(), Date.now(), loadConfig().keyWarnDays);
   } catch {
     return null;
   }
+}
+
+/**
+ * Names the model family running, for the status-line prefix.
+ *
+ * Previously hardcoded to "grok", which misreported every other model.
+ *
+ * @param {Array<{meta: any}>} active Records for the running agents.
+ * @returns {string} The shared family name, or "agents" when they differ.
+ */
+function activeLabel(active) {
+  const families = new Set(active.map(({ meta }) => modelFamily(meta.model?.id)).filter(Boolean));
+  return families.size === 1 ? [...families][0] : "agents";
 }
 
 /**
@@ -134,7 +149,7 @@ async function statusline() {
       return `${meta.title} ${formatElapsed(Date.now() - started)}`;
     });
     const overflow = active.length > 3 ? ` +${active.length - 3}` : "";
-    segments.push(`⚡ ${active.length} grok · ${parts.join(" · ")}${overflow}`);
+    segments.push(`⚡ ${active.length} ${activeLabel(active)} · ${parts.join(" · ")}${overflow}`);
   }
   if (warning) segments.push(warning);
   if (segments.length > 0) process.stdout.write(segments.join(" · "));

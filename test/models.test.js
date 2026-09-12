@@ -3,8 +3,8 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
-  DEFAULT_MODEL_ID,
   estimateCostUsd,
+  modelFamily,
   normaliseModelId,
   requestsFastTier,
   resolveModel,
@@ -32,7 +32,7 @@ describe("requestsFastTier", () => {
 describe("resolveModel", () => {
   it("defaults to grok-4.6 at high effort with fast disabled", () => {
     const model = resolveModel();
-    assert.equal(model.id, DEFAULT_MODEL_ID);
+    assert.equal(model.id, "grok-4.6");
     assert.deepEqual(model.params, [
       { id: "effort", value: "high" },
       { id: "fast", value: "false" },
@@ -94,5 +94,18 @@ describe("estimateCostUsd", () => {
   it("treats cached reads exceeding input as zero fresh input", () => {
     const usd = estimateCostUsd("grok-4.6", { inputTokens: 100, cacheReadTokens: 500 });
     assert.equal(Number(usd.toFixed(6)), 0.00025);
+  });
+});
+
+describe("modelFamily", () => {
+  it("takes the vendor segment before the version", () => {
+    assert.equal(modelFamily("grok-4.6"), "grok");
+    assert.equal(modelFamily("claude-opus-5"), "claude");
+    assert.equal(modelFamily("gpt-5.3-codex"), "gpt");
+  });
+
+  it("returns null for a missing id", () => {
+    assert.equal(modelFamily(undefined), null);
+    assert.equal(modelFamily(""), null);
   });
 });

@@ -9,6 +9,7 @@ import { spawn as spawnProcess } from "node:child_process";
 import { openSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import { loadConfig } from "../config.js";
 import { resolveModel, requestsFastTier } from "../models.js";
 import { agentPaths, newAgentId } from "../paths.js";
 import { createRecord, patchStatus, readMeta, readStatus, TERMINAL_STATES } from "../store.js";
@@ -85,10 +86,13 @@ export function attachInstructions(id, title) {
  * @throws {Error} If the fast tier is requested without `allowFast`.
  */
 export async function spawn(input, sessionId) {
-  if (input.model && requestsFastTier(input.model) && !input.allowFast) {
+  const defaults = loadConfig();
+  const allowFast = input.allowFast ?? defaults.allowFast;
+  if (input.model && requestsFastTier(input.model) && !allowFast) {
     throw new Error(
       `Model "${input.model}" selects the fast tier, which costs roughly double ` +
-        `(grok-4.5-fast is $18/M output vs $6/M). Pass allowFast: true to confirm.`,
+        `(grok-4.5-fast is $18/M output vs $6/M). Pass allowFast: true to confirm, ` +
+        `or set CURSOR_AGENTS_ALLOW_FAST=1 to permit it by default.`,
     );
   }
 
@@ -96,10 +100,10 @@ export async function spawn(input, sessionId) {
   const meta = {
     id,
     title: input.title,
-    model: resolveModel(input),
+    model: resolveModel({ ...input, allowFast }),
     cwd: input.cwd || process.cwd(),
     readOnly: Boolean(input.readOnly),
-    sandbox: Boolean(input.sandbox),
+    sandbox: input.sandbox ?? defaults.sandbox,
     sessionId: sessionId ?? null,
     createdAt: Date.now(),
     turns: 0,

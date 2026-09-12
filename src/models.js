@@ -6,11 +6,7 @@
  * handled here so no caller can hit them by accident. See docs/models.md.
  */
 
-/** Default model used when a caller does not name one. */
-export const DEFAULT_MODEL_ID = "grok-4.6";
-
-/** Default reasoning effort. `low` is markedly faster for trivial work. */
-export const DEFAULT_EFFORT = "high";
+import { loadConfig } from "./config.js";
 
 /** Efforts accepted per model id; grok-4.6 alone offers `xhigh`. */
 const EFFORTS_BY_MODEL = {
@@ -23,8 +19,9 @@ const EFFORTS_BY_MODEL = {
  * unless it was asked for by name.
  *
  * @param {object} [opts] Selection inputs.
- * @param {string} [opts.model] Base model id, e.g. `grok-4.6`. CLI-style ids
- *   such as `cursor-grok-4.6-high` are normalised, since the SDK rejects them.
+ * @param {string} [opts.model] Base model id, e.g. `grok-4.6`. Defaults to
+ *   `CURSOR_AGENTS_MODEL`. CLI-style ids such as `cursor-grok-4.6-high` are
+ *   normalised, since the SDK rejects them.
  * @param {string} [opts.effort] One of `low`, `medium`, `high`, `xhigh`.
  * @param {boolean} [opts.allowFast] Opt in to the fast variant.
  * @returns {{id: string, params: Array<{id: string, value: string}>}} A model
@@ -32,8 +29,9 @@ const EFFORTS_BY_MODEL = {
  * @throws {Error} If the effort is not offered by the chosen model.
  */
 export function resolveModel(opts = {}) {
-  const id = normaliseModelId(opts.model ?? DEFAULT_MODEL_ID);
-  const effort = opts.effort ?? DEFAULT_EFFORT;
+  const defaults = loadConfig();
+  const id = normaliseModelId(opts.model ?? defaults.model);
+  const effort = opts.effort ?? defaults.effort;
 
   const allowed = EFFORTS_BY_MODEL[id];
   if (allowed && !allowed.includes(effort)) {
@@ -116,4 +114,19 @@ export function estimateCostUsd(modelId, usage) {
   if (freshInput + cacheRead + output === 0) return null;
 
   return (freshInput * rates.input + cacheRead * rates.cacheRead + output * rates.output) / 1_000_000;
+}
+
+/**
+ * Extracts the display family from a model id.
+ *
+ * Used to label the status line. The segment before the first version number
+ * is the vendor family: `grok-4.6` is grok, `claude-opus-5` is claude.
+ *
+ * @param {string} [id] Base model id.
+ * @returns {string|null} The family, or null when the id is missing.
+ */
+export function modelFamily(id) {
+  if (!id) return null;
+  const [family] = String(id).split("-");
+  return family || null;
 }

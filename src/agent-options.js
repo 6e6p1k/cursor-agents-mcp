@@ -7,6 +7,7 @@
  */
 
 import { JsonlLocalAgentStore } from "@cursor/sdk";
+import { loadConfig } from "./config.js";
 import { agentPaths } from "./paths.js";
 
 /**
@@ -19,10 +20,16 @@ import { agentPaths } from "./paths.js";
 export const READ_ONLY_DISALLOWED = ["edit", "delete", "applyAgentDiff", "piEdit", "piWrite"];
 
 /**
- * Setting layers loaded from disk. Only MCP servers are gated by this; rules,
- * `AGENTS.md` and skills come from the workspace scan regardless.
+ * Setting layers loaded from disk, from `CURSOR_AGENTS_SETTING_SOURCES`.
+ *
+ * Only MCP servers are gated by this; rules, `AGENTS.md` and skills come from
+ * the workspace scan regardless.
+ *
+ * @returns {string[]} The configured setting sources.
  */
-export const SETTING_SOURCES = ["project", "user", "plugins"];
+export function settingSources() {
+  return loadConfig().settingSources;
+}
 
 /**
  * Builds the options passed to `Agent.create` / `Agent.resume`.
@@ -38,7 +45,7 @@ export function agentOptions(meta) {
     mode: meta.readOnly ? "plan" : "agent",
     local: {
       cwd: meta.cwd,
-      settingSources: SETTING_SOURCES,
+      settingSources: settingSources(),
       // Per-agent store. The SDK's default SQLite layout keeps one index.db for
       // the whole state root, which deadlocks ("database is locked") the moment
       // two runners start at once. Only one runner ever touches a given agent,
