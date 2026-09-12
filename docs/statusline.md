@@ -82,4 +82,9 @@ since agents outlive the session that spawned them.
 ```
 cursor-agents ls [--active]    one line per agent
 cursor-agents log <id>         that agent's digest
+cursor-agents stop <id>        cancel a run without an MCP client
 ```
+
+`stop` exists because runners outlive the session that spawned them. The MCP
+`stop` tool needs a connected client; an agent still running after you closed
+Claude Code does not have one.

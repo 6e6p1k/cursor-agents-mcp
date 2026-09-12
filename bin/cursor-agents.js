@@ -11,6 +11,7 @@ import { authExpiryWarning } from "../src/auth-status.js";
 import { formatElapsed } from "../src/tools/inspect.js";
 import { agentPaths } from "../src/paths.js";
 import { listRecords, readLines, readResult, readStatus, TERMINAL_STATES } from "../src/store.js";
+import { stop as stopAgent } from "../src/tools/control.js";
 
 /** Poll interval while attached to a running agent, in ms. */
 const ATTACH_POLL_MS = 1000;
@@ -158,8 +159,28 @@ async function log(argv) {
   return 0;
 }
 
+/**
+ * Cancels a running agent from the terminal.
+ *
+ * The MCP `stop` tool needs a connected client. Runners outlive the session
+ * that spawned them, so there has to be a way to end one without that client.
+ *
+ * @param {string[]} argv Arguments after the subcommand.
+ * @returns {Promise<number>} Process exit code.
+ */
+async function stop(argv) {
+  const id = argv[0];
+  if (!id) {
+    process.stderr.write("usage: cursor-agents stop <id>\n");
+    return 2;
+  }
+  await stopAgent({ id });
+  process.stdout.write(`cancel requested for ${id}\n`);
+  return 0;
+}
+
 const [, , command, ...rest] = process.argv;
-const commands = { attach, ls, statusline, log };
+const commands = { attach, ls, log, statusline, stop };
 
 if (!command || !(command in commands)) {
   process.stderr.write(`usage: cursor-agents <${Object.keys(commands).join("|")}>\n`);

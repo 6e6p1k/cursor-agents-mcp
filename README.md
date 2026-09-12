@@ -58,6 +58,46 @@ Register with Claude Code, in `~/.claude.json`:
 
 For the status line, see [docs/statusline.md](docs/statusline.md).
 
+## Security
+
+Worth reading before pointing this at a repo you care about.
+
+**Agents run with your permissions, not in a jail.** By default `spawn` gives the
+agent shell access and write access to its working directory — the same reach
+Claude Code or the Cursor CLI already has. Nothing here asks you to approve
+individual commands, because a headless run has nobody to ask.
+
+**The sandbox is off by default, deliberately.** Turning it on
+(`sandbox: true`) confines writes to `cwd` and blocks outbound shell network
+access — but it also blocks *every* MCP tool call, because an approval-gated
+call fails closed with no one to approve it. That trade is documented in
+[docs/sandbox-and-passthrough.md](docs/sandbox-and-passthrough.md). Pick the
+default that fits you; do not assume the shipped one is the safe one.
+
+**`readOnly: true` is the real containment switch.** It runs the agent in plan
+mode with `edit`, `delete`, `applyAgentDiff`, `piEdit` and `piWrite` withheld.
+Use it for research, review, and anything you have not thought hard about.
+
+**Prompts are an injection surface.** An agent that reads a web page, a
+dependency's README, an issue body, or any other untrusted text may act on
+instructions found there — with the shell access above. Treat a delegated agent
+the way you would treat piping untrusted input into your own shell, and reach
+for `readOnly` when the task involves reading things you did not write.
+
+**Runs outlive your session.** Runners are detached on purpose, so closing
+Claude Code does not stop an agent mid-write. Use `cursor-agents ls --active` to
+see what is still going, and `stop` to end it.
+
+**Transcripts are stored in the clear.** `~/.cursor-agents-mcp/agents/<id>/`
+holds every message of every run, including the contents of files the agent
+read. If your repo contains credentials, they now also live there. Delete the
+directory to clear it.
+
+**Your Cursor key is a real credential.** `Cursor.auth.login()` writes a 90-day
+key to `~/.cursor/sdk/auth.json` in plaintext. Revoke it from the Cursor
+dashboard's API-keys page if it leaks — deleting the local file alone does not
+invalidate it.
+
 ## Docs
 
 | | |
