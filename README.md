@@ -118,3 +118,7 @@ npm run typecheck
 
 State lives in `~/.cursor-agents-mcp/`, overridable with
 `CURSOR_AGENTS_STATE_ROOT`.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
