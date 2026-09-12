@@ -1,0 +1,6 @@
+node_modules/
+.DS_Store
+*.log
+
+# Agent records, if CURSOR_AGENTS_STATE_ROOT is ever pointed inside the repo.
+.cursor-agents-mcp/

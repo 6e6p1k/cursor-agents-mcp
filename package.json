@@ -1,0 +1,19 @@
+{
+  "name": "cursor-agents-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "MCP server that delegates work to Cursor SDK agents as reusable, inspectable, detached background jobs.",
+  "engines": { "node": ">=22.13" },
+  "bin": { "cursor-agents": "./bin/cursor-agents.js" },
+  "scripts": {
+    "start": "node ./src/mcp-server.js",
+    "test": "node --test \"test/*.test.js\"",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@cursor/sdk": "^1.0.31",
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": { "typescript": "^5.8.3", "@types/node": "^22.5.5" }
+}
