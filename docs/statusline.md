@@ -10,7 +10,7 @@ An MCP server cannot register anything into it — there is no protocol for that
 The bridge is to have Claude run the CLI as a background task:
 
 ```
-node <repo>/bin/cursor-agents.js attach ag_7f3k2m --title "port auth tests"
+node <repo>/bin/cursor-agents.js attach ag_7f3k2m --title 'port auth tests'
 ```
 
 **The row is labelled from the Bash tool's `description`, not from the command

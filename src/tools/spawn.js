@@ -23,6 +23,19 @@ const RUNNER = join(HERE, "..", "runner.js");
 const CLI = join(HERE, "..", "..", "bin", "cursor-agents.js");
 
 /**
+ * Quotes one word for a POSIX shell.
+ *
+ * Single quotes stop every expansion — `$VAR`, backticks, `\` and `!` —
+ * which `JSON.stringify` did not: bash still expands inside double quotes.
+ *
+ * @param {string} value The raw argument.
+ * @returns {string} The argument wrapped so the shell passes it through verbatim.
+ */
+export function shellQuote(value) {
+  return `'${String(value).replace(/'/g, `'\\''`)}'`;
+}
+
+/**
  * Launches a detached runner for an agent that already has a record on disk.
  *
  * The child is detached and unref'd so it survives both this MCP server and the
@@ -59,7 +72,7 @@ function launchRunner(id, action) {
  */
 export function attachInstructions(id, title) {
   return {
-    attachCommand: `node ${CLI} attach ${id} --title ${JSON.stringify(title)}`,
+    attachCommand: `node ${shellQuote(CLI)} attach ${shellQuote(id)} --title ${shellQuote(title)}`,
     attachDescription: title,
     note:
       "Run attachCommand via Bash with run_in_background:true, passing " +
