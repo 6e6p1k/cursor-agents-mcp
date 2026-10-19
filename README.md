@@ -1,7 +1,12 @@
 # cursor-agents-mcp
 
+[![CI](https://github.com/6e6p1k/cursor-agents-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/6e6p1k/cursor-agents-mcp/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) ![Node 22.13+](https://img.shields.io/badge/node-%3E%3D22.13-brightgreen)
+
 An MCP server that lets Claude Code delegate work to Cursor SDK agents — Grok
 by default — as **detached, reusable, inspectable** background jobs.
+
+**Requires:** Node 22.13+, a Cursor account (SDK login or `CURSOR_API_KEY`),
+Claude Code. The attach bridge assumes a POSIX shell (macOS, Linux, WSL).
 
 The point is cost. Frontier Claude models are expensive for work that does not
 need them. This hands that work to a cheaper model without giving up the

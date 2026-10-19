@@ -70,6 +70,21 @@ export async function readMeta(id) {
 }
 
 /**
+ * Replaces an agent's metadata atomically.
+ *
+ * Only the runner calls this, once, to record the SDK agent id after
+ * `Agent.create`. Readers see either the old document or the new one, never a
+ * truncated file.
+ *
+ * @param {string} id Short agent id.
+ * @param {object} meta The full metadata document to write.
+ * @returns {Promise<void>} Resolves once the rename completes.
+ */
+export async function writeMeta(id, meta) {
+  await writeJsonAtomic(agentPaths(id).meta, meta);
+}
+
+/**
  * Reads an agent's current status.
  *
  * @param {string} id Short agent id.
