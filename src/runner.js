@@ -13,7 +13,7 @@ import { Agent } from "@cursor/sdk";
 import { agentOptions } from "./agent-options.js";
 import { digestMessage, textEntry } from "./digest.js";
 import { agentPaths } from "./paths.js";
-import { appendLine, latestSeq, patchStatus, readLines, readMeta, readStatus, writeResult } from "./store.js";
+import { appendLine, latestSeq, patchStatus, readLines, readMeta, readStatus, writeMeta, writeResult } from "./store.js";
 
 /** How often the control log is checked for steer/cancel requests, in ms. */
 const CONTROL_POLL_MS = 500;
@@ -77,8 +77,7 @@ async function main(id, action) {
   if (!meta.sdkAgentId) {
     meta.sdkAgentId = agent.agentId;
     await appendLine(id, "digest", { seq: 0, t: Date.now(), kind: "status", text: "agent created" });
-    const { writeFile } = await import("node:fs/promises");
-    await writeFile(paths.meta, JSON.stringify(meta, null, 2), "utf8");
+    await writeMeta(id, meta);
   }
 
   const run = await agent.send(prompt);

@@ -5,6 +5,23 @@
   "type": "module",
   "description": "MCP server that delegates work to Cursor SDK agents as reusable, inspectable, detached background jobs.",
   "license": "MIT",
+  "author": "6e6p1k",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/6e6p1k/cursor-agents-mcp.git"
+  },
+  "homepage": "https://github.com/6e6p1k/cursor-agents-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/6e6p1k/cursor-agents-mcp/issues"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "cursor",
+    "claude-code",
+    "agents",
+    "delegation"
+  ],
   "engines": {
     "node": ">=22.13"
   },

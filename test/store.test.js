@@ -1,7 +1,7 @@
 /** @file Unit tests for the on-disk agent record store. */
 
 import assert from "node:assert/strict";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, readdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { after, before, describe, it } from "node:test";
@@ -57,6 +57,17 @@ describe("readMeta", () => {
   it("returns null for an unknown agent rather than throwing", async () => {
     assert.equal(await store.readMeta("ag_nope"), null);
     assert.equal(await store.readStatus("ag_nope"), null);
+  });
+});
+
+describe("writeMeta", () => {
+  it("replaces the document atomically and leaves no temp file", async () => {
+    await seed("ag_meta");
+    const meta = await store.readMeta("ag_meta");
+    await store.writeMeta("ag_meta", { ...meta, sdkAgentId: "sdk-1" });
+    assert.equal((await store.readMeta("ag_meta")).sdkAgentId, "sdk-1");
+    const leftovers = readdirSync(paths.agentPaths("ag_meta").dir).filter((f) => f.endsWith(".tmp"));
+    assert.deepEqual(leftovers, []);
   });
 });
 
