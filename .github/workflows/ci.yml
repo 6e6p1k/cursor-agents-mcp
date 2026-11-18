@@ -22,10 +22,6 @@ jobs:
       matrix:
         # package.json engines says >=22.13; 24 is the current LTS line.
         node: ["22", "24"]
-    env:
-      # The store tests write agent records; keep them out of $HOME on the
-      # runner. The server honours this variable (README, "Development").
-      CURSOR_AGENTS_STATE_ROOT: ${{ runner.temp }}/cursor-agents-mcp
     steps:
       - uses: actions/checkout@v4.2.2
       - uses: actions/setup-node@v4.4.0
@@ -35,3 +31,8 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm test
+        env:
+          # The store tests write agent records; keep them out of $HOME on the
+          # runner. The server honours this variable (README, "Development").
+          # Set on the step: the runner context does not exist at job level.
+          CURSOR_AGENTS_STATE_ROOT: ${{ runner.temp }}/cursor-agents-mcp
